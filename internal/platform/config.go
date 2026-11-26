@@ -8,10 +8,11 @@ import (
 )
 
 type Config struct {
-	Port      string
-	Partners  []Partner
-	Tenants   []string
-	Telemetry Telemetry
+	Port       string
+	Partners   []Partner
+	Tenants    []string
+	Telemetry  Telemetry
+	Resilience Resilience
 }
 
 type Partner struct {
@@ -46,6 +47,9 @@ func LoadConfig(env func(string) string) (Config, error) {
 		return Config{}, err
 	}
 	if cfg.Telemetry, err = parseTelemetry(env); err != nil {
+		return Config{}, err
+	}
+	if cfg.Resilience, err = parseResilience(env); err != nil {
 		return Config{}, err
 	}
 	return cfg, nil

@@ -4,9 +4,16 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"time"
+
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/GuilhermeOliveira591/mba_arquitetura_desafio_cotacao_seguros/internal/platform"
 )
@@ -21,16 +28,75 @@ type Quote struct {
 }
 
 type Client struct {
-	http *http.Client
+	http       *http.Client
+	circuits   map[string]*breaker
+	now        func() time.Time
+	transition metric.Int64Counter
 }
 
 func NewClient() *Client {
 	return &Client{http: &http.Client{Transport: platform.InstrumentTransport(http.DefaultTransport)}}
 }
 
+func NewProtectedClient(partners []platform.Partner, cfg platform.Resilience) *Client {
+	client := NewClient()
+	client.http.Timeout = cfg.PartnerTimeout
+	client.now = time.Now
+	client.circuits = make(map[string]*breaker, len(partners))
+	for _, p := range partners {
+		client.circuits[p.Name] = newBreaker(cfg.FailureLimit, cfg.FailureWindow, cfg.OpenTime)
+	}
+	client.transition, _ = otel.Meter("quotation-api").Int64Counter("quote_breaker_transitions")
+	return client
+}
+
 const responseLimit = 1 << 20
 
 func (c *Client) Quote(ctx context.Context, p platform.Partner, request any) (Quote, error) {
+	circuit := c.circuits[p.Name]
+	if circuit == nil {
+		return c.quote(ctx, p, request)
+	}
+	if err := ctx.Err(); err != nil {
+		return Quote{}, err
+	}
+
+	span := trace.SpanFromContext(ctx)
+	onChange := func(from, to state) {
+		attrs := []attribute.KeyValue{
+			attribute.String("partner", p.Name),
+			attribute.String("from_state", string(from)),
+			attribute.String("to_state", string(to)),
+		}
+		c.transition.Add(ctx, 1, metric.WithAttributes(attrs...))
+		span.AddEvent("quote.breaker.transition", trace.WithAttributes(attrs...))
+	}
+
+	generation, allowed := circuit.admit(c.now(), onChange)
+	if !allowed {
+		span.AddEvent("quote.breaker.rejected", trace.WithAttributes(attribute.String("partner", p.Name)))
+		return Quote{}, ErrCircuitUnavailable
+	}
+	quote, err := c.quote(ctx, p, request)
+	circuit.complete(generation, classify(ctx, err), c.now(), onChange)
+	return quote, err
+}
+
+func classify(ctx context.Context, err error) outcome {
+	if err == nil {
+		return succeeded
+	}
+	if ctx.Err() != nil {
+		return ignored
+	}
+	var failure *Error
+	if errors.As(err, &failure) && failure.Status >= 400 && failure.Status < 500 && failure.Status != 429 {
+		return ignored
+	}
+	return failed
+}
+
+func (c *Client) quote(ctx context.Context, p platform.Partner, request any) (Quote, error) {
 	body, err := json.Marshal(request)
 	if err != nil {
 		return Quote{}, &Error{Partner: p.Name, Reason: fmt.Sprintf("invalid request: %v", err)}

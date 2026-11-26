@@ -13,6 +13,7 @@ import (
 	"github.com/GuilhermeOliveira591/mba_arquitetura_desafio_cotacao_seguros/internal/partner"
 	"github.com/GuilhermeOliveira591/mba_arquitetura_desafio_cotacao_seguros/internal/platform"
 	"github.com/GuilhermeOliveira591/mba_arquitetura_desafio_cotacao_seguros/internal/quotation"
+	"github.com/GuilhermeOliveira591/mba_arquitetura_desafio_cotacao_seguros/internal/quotecache"
 )
 
 func main() {
@@ -29,10 +30,20 @@ func main() {
 		log.Fatalf("telemetry: %v", err)
 	}
 
-	api := quotation.NewAPI(
-		quotation.NewService(cfg.Partners, partner.NewClient()),
-		cfg.Tenants,
+	cache := quotecache.NewRedis(cfg.Resilience.RedisAddress)
+	defer cache.Close()
+
+	service, err := quotation.NewResilientService(
+		cfg.Partners,
+		partner.NewProtectedClient(cfg.Partners, cfg.Resilience),
+		cache,
+		cfg.Resilience.CacheTTL,
+		cfg.Resilience.CacheKeySecret,
 	)
+	if err != nil {
+		log.Fatalf("quotation service: %v", err)
+	}
+	api := quotation.NewAPI(service, cfg.Tenants)
 
 	server := &http.Server{
 		Addr:              ":" + cfg.Port,

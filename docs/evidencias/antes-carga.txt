@@ -1,0 +1,197 @@
+#1 [internal] load local bake definitions
+#1 reading from stdin 2.76kB done
+#1 DONE 0.0s
+
+#2 [partner-flaky internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.04kB done
+#2 DONE 0.0s
+
+#3 [partner-slow internal] load metadata for docker.io/library/golang:1.25-alpine
+#3 DONE 0.5s
+
+#4 [partner-slow internal] load metadata for docker.io/library/alpine:3.20
+#4 DONE 0.6s
+
+#5 [partner-slow internal] load .dockerignore
+#5 transferring context: 119B done
+#5 DONE 0.0s
+
+#6 [quotation-api build 1/6] FROM docker.io/library/golang:1.25-alpine@sha256:1ae0735f00daffa3aaf1363a5184c0d2dc55c78e3db4ec70241cdac97bf84b59
+#6 resolve docker.io/library/golang:1.25-alpine@sha256:1ae0735f00daffa3aaf1363a5184c0d2dc55c78e3db4ec70241cdac97bf84b59 0.0s done
+#6 DONE 0.0s
+
+#7 [partner-degrading stage-1 1/2] FROM docker.io/library/alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc
+#7 resolve docker.io/library/alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc 0.0s done
+#7 DONE 0.0s
+
+#8 [partner-slow internal] load build context
+#8 transferring context: 1.91kB done
+#8 DONE 0.0s
+
+#9 [partner-slow build 6/6] RUN CGO_ENABLED=0 go build -trimpath -o /out/app ./cmd/partner-mock
+#9 CACHED
+
+#10 [partner-slow build 2/6] WORKDIR /src
+#10 CACHED
+
+#11 [partner-slow build 3/6] COPY go.mod go.sum ./
+#11 CACHED
+
+#12 [partner-slow build 4/6] RUN go mod download
+#12 CACHED
+
+#13 [quotation-api build 6/6] RUN CGO_ENABLED=0 go build -trimpath -o /out/app ./cmd/quotation-api
+#13 CACHED
+
+#14 [partner-slow build 5/6] COPY . .
+#14 CACHED
+
+#15 [quotation-api stage-1 2/2] COPY --from=build /out/app /app
+#15 CACHED
+
+#16 [partner-slow stage-1 2/2] COPY --from=build /out/app /app
+#16 CACHED
+
+#17 [partner-slow] exporting to image
+#17 exporting layers done
+#17 exporting manifest sha256:2688b06b28acf0bc0f4a207c81f9e49be29df6c61a229b1e9762c0ae9e9b5dea 0.0s done
+#17 exporting config sha256:3d2620074c1d60d0fa02a6f7024353d5e85a6c1da8f65db7e455f835731bdcee 0.0s done
+#17 exporting attestation manifest sha256:1596d51754c68142de0681161237d34b0eac8285057242f7132f0946c1e4287b 0.0s done
+#17 exporting manifest list sha256:067bb60fe12ccf652853f90e23044adae54772b79048391d78fa70bbc47f7339 0.0s done
+#17 naming to docker.io/library/fullcycle-cotacao-partner-slow:latest done
+#17 unpacking to docker.io/library/fullcycle-cotacao-partner-slow:latest done
+#17 DONE 0.1s
+
+#18 [partner-flaky] exporting to image
+#18 exporting layers done
+#18 exporting manifest sha256:0077eea198a4daed08444f7e68d1e71cf39fcde54fe741acf0a37949e7679674 0.0s done
+#18 exporting config sha256:74e7174072a417991bb15ad866e699a4f161fef819bb68628ded0a00acf7b4c3 0.0s done
+#18 exporting attestation manifest sha256:cc5cf074cecd4438739a099bee87831d8feaeff5cf80a712847127a5aab5663f 0.0s done
+#18 exporting manifest list sha256:1cbbad05d4f562be854a2679eea5dbb0bc4b4caa8c13dc017c2adb6a08e79d29 0.0s done
+#18 naming to docker.io/library/fullcycle-cotacao-partner-flaky:latest done
+#18 unpacking to docker.io/library/fullcycle-cotacao-partner-flaky:latest done
+#18 DONE 0.1s
+
+#19 [quotation-api] exporting to image
+#19 exporting layers done
+#19 exporting manifest sha256:771a32c33818e4bee0519eda97233e38a7cd63673788adf11904e1bd670584d0 0.0s done
+#19 exporting config sha256:8526c0ae3666d65d6dba5abf3ba370e9c1e2c8f4bc8545d2d4f1e021391f21e0 0.0s done
+#19 exporting attestation manifest sha256:d9bbcdc361dd18e7e0ff6999d95a2e8457b19d99453c153c3a7db123455b7b62 0.0s done
+#19 exporting manifest list sha256:8832c40da78507e43dddab07910bb87bb8f02064e4b9a488da79c55990e5b869 0.0s done
+#19 naming to docker.io/library/fullcycle-cotacao-quotation-api:latest done
+#19 unpacking to docker.io/library/fullcycle-cotacao-quotation-api:latest done
+#19 DONE 0.1s
+
+#20 [partner-degrading] exporting to image
+#20 exporting layers done
+#20 exporting manifest sha256:b7c91281748fdcf3298b33179d2980134027faaec92df5007f4eb19f72c78e8c 0.0s done
+#20 exporting config sha256:e8446960847547a9859898a834636d7b47201d5bdd9a188a868e8d691e7e3bdf 0.0s done
+#20 exporting attestation manifest sha256:de5681f8f7f7ce698916150a4a5ecaf2d2daabce55c9d63d44bbb7a785885574 0.0s done
+#20 exporting manifest list sha256:acdda5ae8cd6549feedcc981d52d310b74368802dcf8c7a1add0650ef480f36d 0.0s done
+#20 naming to docker.io/library/fullcycle-cotacao-partner-degrading:latest done
+#20 unpacking to docker.io/library/fullcycle-cotacao-partner-degrading:latest done
+#20 DONE 0.1s
+
+#21 [partner-flaky] resolving provenance for metadata file
+#21 DONE 0.0s
+
+#22 [quotation-api] resolving provenance for metadata file
+#22 DONE 0.0s
+
+#23 [partner-slow] resolving provenance for metadata file
+#23 DONE 0.0s
+
+#24 [partner-degrading] resolving provenance for metadata file
+#24 DONE 0.0s
+#1 [internal] load local bake definitions
+#1 reading from stdin 3.30kB done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.04kB done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/alpine:3.20
+#3 DONE 0.2s
+
+#4 [internal] load metadata for docker.io/library/golang:1.25-alpine
+#4 DONE 0.2s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 119B done
+#5 DONE 0.0s
+
+#6 [stage-1 1/2] FROM docker.io/library/alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc
+#6 resolve docker.io/library/alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc done
+#6 DONE 0.0s
+
+#7 [build 1/6] FROM docker.io/library/golang:1.25-alpine@sha256:1ae0735f00daffa3aaf1363a5184c0d2dc55c78e3db4ec70241cdac97bf84b59
+#7 resolve docker.io/library/golang:1.25-alpine@sha256:1ae0735f00daffa3aaf1363a5184c0d2dc55c78e3db4ec70241cdac97bf84b59 done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 1.91kB done
+#8 DONE 0.0s
+
+#9 [build 2/6] WORKDIR /src
+#9 CACHED
+
+#10 [build 3/6] COPY go.mod go.sum ./
+#10 CACHED
+
+#11 [build 4/6] RUN go mod download
+#11 CACHED
+
+#12 [build 5/6] COPY . .
+#12 CACHED
+
+#13 [build 6/6] RUN CGO_ENABLED=0 go build -trimpath -o /out/app ./cmd/loadgen
+#13 DONE 21.9s
+
+#6 [stage-1 1/2] FROM docker.io/library/alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc
+#6 CACHED
+
+#14 [stage-1 2/2] COPY --from=build /out/app /app
+#14 DONE 0.0s
+
+#15 exporting to image
+#15 exporting layers
+#15 exporting layers 0.5s done
+#15 exporting manifest sha256:ebbfc7f390241ab6175e6f29d9f9ba40deaa52fb52552ddf2e5df70a84365f0b done
+#15 exporting config sha256:cef508fc5d1551cad6eec8614c0b30807754ad7e326e45e3ab072f2ab3405c91 done
+#15 exporting attestation manifest sha256:5f50e780f6209aa02ba51c1b493178f66ee06592af00660f484dda9a7b65f886 done
+#15 exporting manifest list sha256:14e2a508a79fbf0e31c709b9ccc5a88b2050a917542a19dc832a930b195746ea done
+#15 naming to docker.io/library/fullcycle-cotacao-loadgen:latest done
+#15 unpacking to docker.io/library/fullcycle-cotacao-loadgen:latest 0.1s done
+#15 DONE 0.7s
+
+#16 resolving provenance for metadata file
+#16 DONE 0.0s
+baseline: 10 requests, one at a time...
+load: 200 requests, 50 at a time...
+
+loadgen · http://quotation-api:8080/quotes · tenant corretora-a · 5 distinct quotes
+
+baseline — 10 requests, 1 in flight, 01:31:56 UTC to 01:32:15 UTC
+  success        5 of 10 (50%)
+  latency        p50 1.89s   p95 2.04s   p99 2.04s   max 2.04s
+  throughput     0.5 req/s in 18.77s
+  failures       HTTP 502 from partner-flaky: 5
+
+load — 200 requests, 50 in flight, 01:32:15 UTC to 01:32:39 UTC
+  success        120 of 200 (60%)
+  latency        p50 6.11s   p95 8.01s   p99 8.04s   max 8.06s
+  throughput     8.1 req/s in 24.84s
+  failures       HTTP 502 from partner-flaky: 80
+
+baseline → load
+  p95 latency    2.04s → 8.01s   3.9x
+  max latency    2.04s → 8.06s   4.0x
+  success        50% → 60%
+  throughput     0.5 → 8.1 req/s
+
+where to look
+  Jaeger         http://localhost:16686 · service quotation-api · operation POST /quotes
+  load window    01:32:15 UTC to 01:32:39 UTC (sort by longest first)
+  step by step   docs/roteiro-cenario-de-falha.md
+

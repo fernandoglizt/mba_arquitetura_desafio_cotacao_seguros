@@ -1,0 +1,57 @@
+Carga fria: 150 riscos, 14 em voo
+load: 150 requests, 14 at a time...
+
+loadgen · http://127.0.0.1:18081/quotes · tenant corretora-a · 150 distinct quotes
+
+load — 150 requests, 14 in flight, 22:46:27 -03 to 22:46:45 -03
+  success        150 of 150 (100%)
+  latency        p50 1.62s   p95 1.96s   p99 2.01s   max 2.01s
+  throughput     8.4 req/s in 17.93s
+
+where to look
+  Jaeger         http://localhost:16686 · service quotation-api · operation POST /quotes
+  load window    22:46:27 -03 to 22:46:45 -03 (sort by longest first)
+  step by step   docs/roteiro-cenario-de-falha.md
+
+Sondas a uma chamada por vez, em outra corretora
+load: 8 requests, 1 at a time...
+
+loadgen · http://127.0.0.1:18081/quotes · tenant corretora-b · 8 distinct quotes
+
+load — 8 requests, 1 in flight, 22:46:50 -03 to 22:47:02 -03
+  success        8 of 8 (100%)
+  latency        p50 1.56s   p95 1.67s   p99 1.67s   max 1.67s
+  throughput     0.6 req/s in 12.63s
+
+where to look
+  Jaeger         http://localhost:16686 · service quotation-api · operation POST /quotes
+  load window    22:46:50 -03 to 22:47:02 -03 (sort by longest first)
+  step by step   docs/roteiro-cenario-de-falha.md
+
+Repetição de cinco riscos, em outra corretora
+baseline: 10 requests, one at a time...
+load: 200 requests, 50 at a time...
+
+loadgen · http://127.0.0.1:18081/quotes · tenant corretora-b · 5 distinct quotes
+
+baseline — 10 requests, 1 in flight, 22:47:03 -03 to 22:47:03 -03
+  success        10 of 10 (100%)
+  latency        p50 2ms   p95 196ms   p99 196ms   max 196ms
+  throughput     17.6 req/s in 566ms
+
+load — 200 requests, 50 in flight, 22:47:03 -03 to 22:47:03 -03
+  success        200 of 200 (100%)
+  latency        p50 10ms   p95 24ms   p99 30ms   max 31ms
+  throughput     3580.7 req/s in 55ms
+
+baseline → load
+  p95 latency    196ms → 24ms   0.1x
+  max latency    196ms → 31ms   0.2x
+  success        100% → 100%
+  throughput     17.6 → 3580.7 req/s
+
+where to look
+  Jaeger         http://localhost:16686 · service quotation-api · operation POST /quotes
+  load window    22:47:03 -03 to 22:47:03 -03 (sort by longest first)
+  step by step   docs/roteiro-cenario-de-falha.md
+

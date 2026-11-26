@@ -26,9 +26,6 @@ x-parceira: &parceira
     retries: 5
 
 services:
-  # A API que o aluno instrumenta. Ela consulta as tres parceiras EM SERIE, sem timeout, sem circuit
-  # breaker, sem cache e sem fallback — o Redis abaixo sobe justamente para o cache que ainda nao
-  # existe. O vazio e o enunciado.
   quotation-api:
     build:
       context: .
@@ -42,6 +39,8 @@ services:
       PORT: "8080"
       PARTNER_ENDPOINTS: "partner-slow=http://partner-slow:8080,partner-flaky=http://partner-flaky:8080,partner-degrading=http://partner-degrading:8080"
       TENANTS: "corretora-a,corretora-b"
+      REDIS_ADDR: "redis:6379"
+      CACHE_KEY_SECRET: "${CACHE_KEY_SECRET:-}"
       # O SDK do OpenTelemetry ja sobe ligado e manda tudo para o Collector — o aluno nao precisa
       # escrever uma linha para ver o trace da requisicao no Jaeger. Para desligar: OTEL_SDK_DISABLED=true.
       OTEL_SERVICE_NAME: quotation-api

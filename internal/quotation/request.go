@@ -3,6 +3,7 @@ package quotation
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/GuilhermeOliveira591/mba_arquitetura_desafio_cotacao_seguros/internal/partner"
 )
@@ -61,8 +62,20 @@ type partnerRequest struct {
 	Request
 }
 
+type QuoteSource struct {
+	Partner    string    `json:"partner"`
+	Source     string    `json:"source"`
+	QuotedAt   time.Time `json:"quoted_at"`
+	AgeSeconds *int64    `json:"age_seconds,omitempty"`
+}
+
 type Response struct {
-	TenantID  string          `json:"tenant_id"`
-	Quotes    []partner.Quote `json:"quotes"`
-	ElapsedMs int64           `json:"elapsed_ms"`
+	TenantID        string          `json:"tenant_id"`
+	Quotes          []partner.Quote `json:"quotes"`
+	ElapsedMs       int64           `json:"elapsed_ms"`
+	Sources         []QuoteSource   `json:"sources,omitempty"`
+	Degraded        bool            `json:"degraded,omitempty"`
+	MissingPartners []string        `json:"missing_partners,omitempty"`
+	Error           string          `json:"error,omitempty"`
+	NextAction      string          `json:"next_action,omitempty"`
 }

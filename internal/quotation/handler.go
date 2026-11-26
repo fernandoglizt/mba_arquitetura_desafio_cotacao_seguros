@@ -1,6 +1,7 @@
 package quotation
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -13,12 +14,16 @@ const TenantHeader = "X-Tenant-Id"
 
 const requestLimit = 1 << 20
 
+type quoteService interface {
+	Quote(context.Context, string, Request) (Response, error)
+}
+
 type API struct {
-	service *Service
+	service quoteService
 	tenants map[string]bool
 }
 
-func NewAPI(service *Service, tenants []string) *API {
+func NewAPI(service quoteService, tenants []string) *API {
 	known := make(map[string]bool, len(tenants))
 	for _, t := range tenants {
 		known[t] = true
@@ -60,6 +65,11 @@ func (a *API) quote(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response, err := a.service.Quote(r.Context(), tenant, request)
+	if errors.Is(err, ErrNoQuotes) {
+		w.Header().Set(TenantHeader, tenant)
+		platform.WriteJSON(w, http.StatusServiceUnavailable, response)
+		return
+	}
 	if err != nil {
 		a.respondPartnerFailure(w, err)
 		return
